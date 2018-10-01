@@ -2,9 +2,10 @@
 from collections import deque
 import sys
 
-secretNum = "98765"
+secretNum = "45458"
 counter = 1
 notInSecretNum = []
+positionsTaken = []
 actualNum = list("xxxxx")
 
 def actualTotalGoats() :
@@ -59,39 +60,32 @@ def printStats(Snum, chicken, goat) :
 
 # this works
 def find_digit_position_for_one_goat(Sdigit, increment) :
-	if len(notInSecretNum) == 0 :
-		Snum1 = Sdigit + ("5" * 4)
-	else :
-		Snum2 = Sdigit + ((notInSecretNum[0]) * 4)
 
+	Snum = Sdigit + ((notInSecretNum[0]) * 4)
 	for i in range(0, 5, increment) :
-		if len(notInSecretNum) == 0 :
-			chicken = test_Guess_Number_Chicken(Snum1, 0)
-			goat = test_Guess_Number_Goat(Snum1, 0)
-			printStats(Snum1, chicken, goat)
+		#currentIndex = 0
+		if i not in positionsTaken :
+			#print(i)
+			chicken = test_Guess_Number_Chicken(Snum, 0)
+			goat = test_Guess_Number_Goat(Snum, 0)
+			printStats(Snum, chicken, goat)
 			if goat == 0 :
-				temp_Snum = deque(list(Snum1))
+				temp_Snum = deque(list(Snum))
 				#print("i: " + str(i))
 				temp_Snum.rotate(increment)
-				Snum1 = ''.join(temp_Snum)
+				Snum = ''.join(temp_Snum)
+				#currentIndex += 1
 				#print(Snum1)
 			else :
 				actualNum[i] = Sdigit
+				positionsTaken.append(i)
 				#print(''.join(actualNum))
 				break
-
 		else :
-			chicken = test_Guess_Number_Chicken(Snum2, 0)
-			goat = test_Guess_Number_Goat(Snum2, 0)
-			printStats(Snum2, chicken, goat)
-			if goat == 0 :
-				temp_Snum = deque(list(Snum2))
-				temp_Snum.rotate(increment)
-				Snum2 = ''.join(temp_Snum)
-			else :
-				actualNum[i] = Sdigit
-				#print(''.join(actualNum))
-				break
+			temp_Snum = deque(list(Snum))
+				#print("i: " + str(i))
+			temp_Snum.rotate(increment)
+			Snum = ''.join(temp_Snum)
 
 
 def algorithm_for_two_goats(Sdigit, Snum_even, Snum_odd) :
@@ -110,10 +104,7 @@ def algorithm_for_two_goats(Sdigit, Snum_even, Snum_odd) :
 				find_digit_position_for_one_goat(Sdigit, 2)
 
 			else :
-				if len(notInSecretNum) == 0 :
-					Snum_even = ((Sdigit + "5") * 2) + "5"
-				else :
-					Snum_even = ((Sdigit + notInSecretNum[0]) * 2) + notInSecretNum[0]
+				Snum_even = ((Sdigit + notInSecretNum[0]) * 2) + notInSecretNum[0]
 
 				#Snum_even = ((Sdigit + "5") * 2) + "5"
 				chicken = test_Guess_Number_Chicken(Snum_even, 0)
@@ -156,25 +147,15 @@ def algorithm_for_two_goats(Sdigit, Snum_even, Snum_odd) :
 			else:
 				actualNum[1] = Sdigit
 
-
-
 					
 def find_digit_position_for_two_goats(Sdigit) :
-	if len(notInSecretNum) == 0 :
-		Snum1_even = ((Sdigit + "5") * 2) + Sdigit
-		#print(Snum1_even)
-		Snum1_odd = ("5" + Sdigit) + ("5" * 3) 
-		#print(Snum1_odd)
-	else :
-		Snum2_even = ((Sdigit + notInSecretNum[0]) * 2) + Sdigit
+
+	Snum_even = ((Sdigit + notInSecretNum[0]) * 2) + Sdigit
 		#print(Snum2_even)
-		Snum2_odd = (notInSecretNum[0] + Sdigit) + (notInSecretNum[0] * 3)
+	Snum_odd = (notInSecretNum[0] + Sdigit) + (notInSecretNum[0] * 3)
 		#print(Snum2_odd)
 
-	if len(notInSecretNum) == 0 :
-		algorithm_for_two_goats(Sdigit, Snum1_even, Snum1_odd)
-	else :
-		algorithm_for_two_goats(Sdigit, Snum2_even, Snum2_odd)
+	algorithm_for_two_goats(Sdigit, Snum_even, Snum_odd)
 
 
 
@@ -183,180 +164,176 @@ def algorithm_for_three_goats(Sdigit, Snum_even, Snum_odd) :
 	goat = test_Guess_Number_Goat(Snum_even, 0)
 	printStats(Snum_even, chicken, goat)
 
+	# if first guess resulted in 3 goats, then correctly guessed
+	# the 3 positions that hold the specified Sdigit within the secret number
 	if goat == 3 :
 		actualNum[0] = Sdigit
 		actualNum[2] = Sdigit
 		actualNum[4] = Sdigit
 
-
+	# means two of the positions that contain the specified Sdigit within guess
+	# is correctly placed
+	# must figure out which ones 
 	elif goat == 2 :
-		print("here")
-		if len(notInSecretNum) == 0 :
-			Snum_even = ((Sdigit + "5") * 2) + "5"
-		else :
-			Snum_even = ((Sdigit + notInSecretNum[0]) * 2) + notInSecretNum[0]
+		# start off with placing the specified Sdigit within the 0 and 2 index position
+		Snum_even = ((Sdigit + notInSecretNum[0]) * 2) + notInSecretNum[0]
 
+		# X 0 X 0 0
 		chicken = test_Guess_Number_Chicken(Snum_even, 0)
 		goat = test_Guess_Number_Goat(Snum_even, 0)
 		printStats(Snum_even, chicken, goat)
-		print("here1")
+		
+		# if only 1 was correct then must find which of the 2 even index positions hold
+		# 2 of the specified digit
 		if goat == 1 :
 			temp_Snum_even = deque(list(Snum_even))
-			temp_Snum_even.rotate(2)
+			temp_Snum_even.rotate(2) # shifting each character by 2
 			Snum_even = ''.join(temp_Snum_even)
+
+			# 0 0 X 0 X
+			# making another guess
 			chicken = test_Guess_Number_Chicken(Snum_even, 0)
 			goat = test_Guess_Number_Goat(Snum_even, 0)
 			printStats(Snum_even, chicken, goat)
-			print("here2")
-			print(goat)
+			
+			# if still got 1 then 2 of the specfied Sdigit has to be placed 
+			# at positions 0 and 4 within the secret number
 			if goat == 1 :
 				actualNum[0] = Sdigit
 				actualNum[4] = Sdigit
+
+				# now must locate which of the odd position index holds the 
+				# third specified digit
+				# 0 X 0 0 0
 				chicken = test_Guess_Number_Chicken(Snum_odd, 0)
 				goat = test_Guess_Number_Goat(Snum_odd, 0)
 				printStats(Snum_odd, chicken, goat)
+
+				# correctly guessed the position of the third digit of the specified
+				# digit
 				if goat == 1 :
 					actualNum[1] = Sdigit
-							#break
+				
+				# then it has to be in the other odd index position, which is at 3
+				# 0 0 0 X 0			
 				else :
 					actualNum[3] = Sdigit
-							#break
+			
+			# if it resulted in 2 goats then know where 2 of 
+			# the specified digit are located 
 			else :
 				actualNum[2] = Sdigit
 				actualNum[4] = Sdigit
+
+				# now must locate which of the odd position index holds the 
+				# third specified digit
+				# 0 X 0 0 0
 				chicken = test_Guess_Number_Chicken(Snum_odd, 0)
 				goat = test_Guess_Number_Goat(Snum_odd, 0)
 				printStats(Snum_odd, chicken, goat)
+
+				# correctly guessed the position of the third digit of the specified
+				# digit
 				if goat == 1 :
 					actualNum[1] = Sdigit
-							#break
+				
+				# then it has to be in the other odd index position, which is at 3
+				# 0 0 0 X 0
 				else :
 					actualNum[3] = Sdigit
 
-				# 4 X 4 X 5
+		# if it resulted in 2 goasts then 2 of the specified digit
+		# are located at 0 and 2 index position
 		elif goat == 2 :
 			actualNum[0] = Sdigit
 			actualNum[2] = Sdigit
+
+			#now finding the third
+			# 0 X 0 0 0
 			chicken = test_Guess_Number_Chicken(Snum_odd, 0)
 			goat = test_Guess_Number_Goat(Snum_odd, 0)
 			printStats(Snum_odd, chicken, goat)
 
+			# correctly guessed the position of the third digit of the specified
+			# digit
 			if goat == 1 :
 				actualNum[1] = Sdigit
-						#break
+			
+			# no goats so then it has to be in the other odd index position, which is at 3
+			# 0 0 0 X 0
 			else :
 				actualNum[3] = Sdigit
-						#break
+	
+	# if it resulted in 0 goats then know that one of the specified digit is located
+	# at one of the even index position so check each one
+	# already know that the 2 other locations of the specified digit must be at the 
+	# odd position 
 	else :
 		find_digit_position_for_one_goat(Sdigit, 2)
 		actualNum[1] = Sdigit
 		actualNum[3] = Sdigit
 
 def find_digit_position_for_three_goats(Sdigit) :
-	if len(notInSecretNum) == 0 :
-		Snum1_even = ((Sdigit + "5") * 2) + Sdigit
-		#print(Snum1_even)
-		Snum1_odd = ("5" + Sdigit) + ("5" * 3) 
-		#print(Snum1_odd)
-	else :
-		Snum2_even = ((Sdigit + notInSecretNum[0]) * 2) + Sdigit
+	Snum_even = ((Sdigit + notInSecretNum[0]) * 2) + Sdigit
 		#print(Snum2_even)
-		Snum2_odd = (notInSecretNum[0] + Sdigit) + (notInSecretNum[0] * 3)
+	Snum_odd = (notInSecretNum[0] + Sdigit) + (notInSecretNum[0] * 3)
 
-	if len(notInSecretNum) == 0 :
-		algorithm_for_three_goats(Sdigit, Snum1_even, Snum1_odd)
-	else :
-		algorithm_for_three_goats(Sdigit, Snum2_even, Snum2_odd)
+	algorithm_for_three_goats(Sdigit, Snum_even, Snum_odd)
+
 
 
 def algorithm_for_four_goats(Sdigit, Snum) :
-	if len(notInSecretNum) == 0 :
-		Snum = Sdigit + ("5" * 4)
-	else :
-		Snum = Sdigit + ((notInSecretNum[0]) * 4)
 
+	Snum = Sdigit + ((notInSecretNum[0]) * 4)
+	# checking each position within the number
 	for i in range(0, 5, 1) :
-		#if len(notInSecretNum) == 0 :
-		chicken = test_Guess_Number_Chicken(Snum, 0)
-		goat = test_Guess_Number_Goat(Snum, 0)
-		printStats(Snum, chicken, goat)
-
-		if goat == 0 :
-			#print(i)
-			
-			for j in range(0, 5, 1) :
-				if j != i :
-					print(j)
-					actualNum[j] = Sdigit
-			break
-		
+		if i not in positionsTaken :
+			actualNum[i] = Sdigit
 
 		else :
 			temp_Snum = deque(list(Snum))
-			temp_Snum.rotate(1)
-			Snum = ''.join(temp_Snum)
-				
+			temp_Snum.rotate(1) # shifting the characters to the right by 1
+			Snum = ''.join(temp_Snum) # putting it back to string form
 
+				
 def find_digit_position_for_four_goats(Sdigit) :
-	#Snum = ""
-	if len(notInSecretNum) == 0 :
-		Snum = Sdigit + ("5" *4)
-	else :
-		print("hi")
-		Snum = Sdigit + ((notInSecretNum[0] * 4))
-		#algorithm_for_four_goats(Sdigit, Snum1)
-	
+
+	Snum = Sdigit + ((notInSecretNum[0] * 4))
 	algorithm_for_four_goats(Sdigit, Snum)
 
-
-
-
-if __name__ == "__main__" :
-	chicken = 0
-	goat = 0
-	guessNum = "01234" 
-	chicken = test_Guess_Number_Chicken(guessNum, chicken)
-	goat = test_Guess_Number_Goat(guessNum, goat)
-	print('')
-	printStats(guessNum, chicken, goat)
-	#print stats (use seperate function to check)
-
-	if guessNum == secretNum :
-		sys.exit(0)
-	#want to find a number that isn't in the secret number
-	num = find_Num_Not_In_Secret_Number(guessNum)
-
-	for i in range(0, 10, 1) :
+def simulation(start, end, chicken, goat) :
+	
+	for i in range(start, end, 1) :
 		stringDigit = str(i)
 		stringNum = stringDigit * 5
 		chicken = test_Guess_Number_Chicken(stringNum, chicken)
 		goat = test_Guess_Number_Goat(stringNum, goat)
 		printStats(stringNum, chicken, goat)
-		
+
 		if goat == 1 :
 			find_digit_position_for_one_goat(stringDigit, 1)
-			print(''.join(actualNum))
+		#print(''.join(actualNum))
 			num = actualTotalGoats()
 			if num == 5 :
 				break
-			
+
 		elif goat == 2 :
 			find_digit_position_for_two_goats(stringDigit)
-			print(''.join(actualNum))
+		#print(''.join(actualNum))
 			num = actualTotalGoats()
 			if num == 5 :
 				break
-		
+
 		elif goat == 3 :
 			find_digit_position_for_three_goats(stringDigit)
-			print(''.join(actualNum))
+		#print(''.join(actualNum))
 			num = actualTotalGoats()
 			if num == 5 :
 				break
 
 		elif goat == 4 :
 			find_digit_position_for_four_goats(stringDigit)
-			print(''.join(actualNum))
+		#print(''.join(actualNum))
 			num = actualTotalGoats()
 			if num == 5 :
 				break
@@ -365,7 +342,44 @@ if __name__ == "__main__" :
 			actualNum = list(stringNum)
 			sys.exit(0)
 
-		
+
+if __name__ == "__main__" :
+	chicken = 0
+	goat = 0
+	guessNum = "01234" # making my first guess
+	chicken = test_Guess_Number_Chicken(guessNum, chicken)
+	goat = test_Guess_Number_Goat(guessNum, goat)
+	print('')
+	printStats(guessNum, chicken, goat)
+	#print stats (use seperate function to check)
+
+	# in the case if my first attempt happened to be the secret number
+	if guessNum == secretNum :
+		sys.exit(0)
+
+	if chicken == 5 :
+		notInSecretNum.append('5')
+		simulation(0, 5, chicken, goat)
+
+	elif chicken == 0 :
+		notInSecretNum.append('0')
+		simulation(5, 10, chicken, goat)
+
+	else :
+		for i in range(0, 5, 1) :
+			stringDigit = str(i)
+			stringNum = stringDigit * 5
+			chicken = test_Guess_Number_Chicken(stringNum, chicken)
+			goat = test_Guess_Number_Goat(stringNum, goat)
+			printStats(stringNum, chicken, goat)
+
+			if goat == 0 :
+				notInSecretNum.append(stringDigit)
+				break
+
+		simulation(0, 10, chicken, goat)
+
+
 	num = actualTotalGoats()
 	if num == 5 :
 		finalGuess = ''.join(actualNum)
